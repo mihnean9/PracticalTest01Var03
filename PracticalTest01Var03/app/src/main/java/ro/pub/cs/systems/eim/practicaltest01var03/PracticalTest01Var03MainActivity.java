@@ -48,12 +48,21 @@ public class PracticalTest01Var03MainActivity extends AppCompatActivity {
                     break;
 
                 case R.id.buttonNavigateToSecondActivity:
+                    Intent intent = new Intent(getApplicationContext(), PracticalTest01Var03SecondaryActivity.class);
+                    String operation;
+                    if (textViewResult.getText().toString().contains("+"))
+                        operation = "ADDITION";
+                    else if ((textViewResult.getText().toString().contains("-")))
+                        operation = "SUBTRACTION";
+                    else
+                        operation = "NO OPERATION";
+                    String s = operation + ": " + textViewResult.getText();
+                    intent.putExtra(Constants.OPERATION_AND_RESULT, s);
+                    startActivityForResult(intent, Constants.SECONDARY_ACTIVITY_REQUEST_CODE);
                     break;
             }
         }
     }
-
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -99,7 +108,19 @@ public class PracticalTest01Var03MainActivity extends AppCompatActivity {
         } else {
             textViewResult.setText("");
         }
+
+        String s = "Operand1 : " + textOperand1.getText().toString() + "\n";
+        s = s + "Operand2: " + textOperand2.getText().toString() + "\n";
+        s = s + "Result: " + textViewResult.getText().toString();
+        Toast.makeText(this, s, Toast.LENGTH_SHORT).show();
     }
 
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent intent) {
+        super.onActivityResult(requestCode, resultCode, intent);
+        if (requestCode == Constants.SECONDARY_ACTIVITY_REQUEST_CODE) {
+            Toast.makeText(this, "Secondary activity returned with code " + resultCode, Toast.LENGTH_LONG).show();
+        }
+    }
 
 }

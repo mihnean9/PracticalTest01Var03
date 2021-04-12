@@ -1,7 +1,9 @@
 package ro.pub.cs.systems.eim.practicaltest01var03;
 
 public interface Constants {
-    final public static String FIRST_OPERAND = "firstOperand";
-    final public static String SECOND_OPERAND = "secondOperand";
-    final public static String OPERATION_RESULT = "operationResult";
+    String FIRST_OPERAND = "firstOperand";
+    String SECOND_OPERAND = "secondOperand";
+    String OPERATION_RESULT = "operationResult";
+    String OPERATION_AND_RESULT = "operationAndResult";
+    int SECONDARY_ACTIVITY_REQUEST_CODE = 1;
 }
