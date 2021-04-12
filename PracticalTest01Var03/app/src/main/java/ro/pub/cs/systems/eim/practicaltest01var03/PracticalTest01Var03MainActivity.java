@@ -3,8 +3,12 @@ package ro.pub.cs.systems.eim.practicaltest01var03;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.annotation.SuppressLint;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -16,6 +20,7 @@ public class PracticalTest01Var03MainActivity extends AppCompatActivity {
     EditText textOperand1, textOperand2;
     Button buttonAddition, buttonSubtraction, buttonToSecondary;
     TextView textViewResult;
+    private IntentFilter intentFilter = new IntentFilter();
 
     private ButtonClickListener buttonClickListener = new ButtonClickListener();
     private class ButtonClickListener implements View.OnClickListener {
@@ -35,20 +40,29 @@ public class PracticalTest01Var03MainActivity extends AppCompatActivity {
             int aValue = Integer.parseInt(a);
             int bValue = Integer.parseInt(b);
             int result;
+            Intent intent;
 
             switch(view.getId()) {
                 case R.id.buttonAddition:
                     result = aValue + bValue;
                     textViewResult.setText(aValue + " + " + bValue + " = " + result);
+                    intent = new Intent(getApplicationContext(), PracticalTest01Var03Service.class);
+                    intent.putExtra(Constants.FIRST_OPERAND, aValue);
+                    intent.putExtra(Constants.SECOND_OPERAND, bValue);
+                    getApplicationContext().startService(intent);
                     break;
 
                 case R.id.buttonSubtraction:
                     result = aValue - bValue;
                     textViewResult.setText(aValue + " - " + bValue + " = " + result);
+                    intent = new Intent(getApplicationContext(), PracticalTest01Var03Service.class);
+                    intent.putExtra(Constants.FIRST_OPERAND, aValue);
+                    intent.putExtra(Constants.SECOND_OPERAND, bValue);
+                    getApplicationContext().startService(intent);
                     break;
 
                 case R.id.buttonNavigateToSecondActivity:
-                    Intent intent = new Intent(getApplicationContext(), PracticalTest01Var03SecondaryActivity.class);
+                    intent = new Intent(getApplicationContext(), PracticalTest01Var03SecondaryActivity.class);
                     String operation;
                     if (textViewResult.getText().toString().contains("+"))
                         operation = "ADDITION";
@@ -62,6 +76,33 @@ public class PracticalTest01Var03MainActivity extends AppCompatActivity {
                     break;
             }
         }
+    }
+
+    private MessageBroadcastReceiver messageBroadcastReceiver = new MessageBroadcastReceiver();
+    private class MessageBroadcastReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Log.d(Constants.BROADCAST_RECEIVER_TAG, intent.getStringExtra(Constants.BROADCAST_RECEIVER_EXTRA));
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        registerReceiver(messageBroadcastReceiver, intentFilter);
+    }
+
+    @Override
+    protected void onPause() {
+        unregisterReceiver(messageBroadcastReceiver);
+        super.onPause();
+    }
+
+    @Override
+    protected void onDestroy() {
+        Intent intent = new Intent(this, PracticalTest01Var03Service.class);
+        stopService(intent);
+        super.onDestroy();
     }
 
     @Override
@@ -79,6 +120,10 @@ public class PracticalTest01Var03MainActivity extends AppCompatActivity {
         buttonAddition.setOnClickListener(buttonClickListener);
         buttonSubtraction.setOnClickListener(buttonClickListener);
         buttonToSecondary.setOnClickListener(buttonClickListener);
+
+        for (int index = 0; index < Constants.actionTypes.length; index++) {
+            intentFilter.addAction(Constants.actionTypes[index]);
+        }
     }
 
     @Override
